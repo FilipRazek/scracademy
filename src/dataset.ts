@@ -1,23 +1,29 @@
 import { Dataset, Configuration } from "crawlee";
+import { ApifyClient, DownloadItemsFormat } from "apify-client";
+import { writeFileSync } from "fs";
+
+import * as dotenv from "dotenv";
+dotenv.config();
+
+const apifyToken = process.env.APIFY_TOKEN;
+if (!apifyToken) throw new Error("Missing API token");
 
 Configuration.getGlobalConfig().set("purgeOnStart", false);
 
 const dataset = await Dataset.open();
 const { items } = await dataset.getData();
 
-let mostExpensive: { title?: string; price?: number };
+const apifyClient = new ApifyClient({
+  token: apifyToken,
+});
 
-const THRESHOLD = 50;
-console.log(`All items over $${THRESHOLD}:`);
+console.log("Creating a new dataset on the Apify platform");
+const remoteDataset = await apifyClient.datasets().getOrCreate();
+const datasetClient = apifyClient.dataset(remoteDataset.id);
 
-const extractPrice = (price: string) => Number(price.replace(/[^0-9\.]/g, ""));
+console.log("Uploading dataset items to the newly created dataset");
+await datasetClient.pushItems(items);
 
-for (const { price, title } of items) {
-  const priceNumber = extractPrice(price);
-  if (priceNumber > THRESHOLD) console.table({ title, price });
-  if (!mostExpensive || priceNumber > mostExpensive.price)
-    mostExpensive = { title, price };
-}
-
-console.log("Most expensive item:");
-console.table(mostExpensive);
+console.log("Downloading an Excel file and saving it to disk");
+const xlsx = await datasetClient.downloadItems(DownloadItemsFormat.XLSX);
+writeFileSync("dataset.xlsx", xlsx);
