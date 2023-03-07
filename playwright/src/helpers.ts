@@ -1,4 +1,17 @@
 import { Page } from "playwright";
+import { CheerioAPI, Element } from "cheerio";
+
+const getProductInfo = ($: CheerioAPI) => (element: Element) => {
+  const card = $(element);
+  const name = card.find('h3[class*="ProductCard_name"]').text();
+  const price = card.find('div[class*="ProductCard_price"]').text();
+  return { name, price };
+};
+
+export const getProductsFromStore = ($: CheerioAPI) => {
+  const productCards = Array.from($('a[class*="ProductCard_root"]'));
+  return productCards.map(getProductInfo($));
+};
 
 export const evaluateFunctionOnPage = async <ReturnType>(
   page: Page,
