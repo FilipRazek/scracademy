@@ -1,6 +1,9 @@
 import { Page } from "playwright";
 import { CheerioAPI, Element } from "cheerio";
 
+export const randomArrayChoice = <T>(arr: T[]) =>
+  arr[Math.floor(Math.random() * arr.length)];
+
 const getProductInfo = ($: CheerioAPI) => (element: Element) => {
   const card = $(element);
   const name = card.find('h3[class*="ProductCard_name"]').text();

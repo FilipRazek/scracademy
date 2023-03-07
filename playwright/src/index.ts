@@ -1,19 +1,14 @@
 import { chromium } from "playwright";
+import dotenv from "dotenv";
+import { getEmailsToSend, sendEmails, signInToYahoo } from "./yahooHelpers.js";
+dotenv.config();
+
+const USERNAME = process.env.YAHOO_USERNAME;
+const PASSWORD = process.env.YAHOO_PASSWORD;
 
 const browser = await chromium.launch({ headless: false });
-const page = await browser.newPage();
+const cookies = await signInToYahoo(browser, USERNAME, PASSWORD);
 
-const mainUser = "tiesto";
-const stubUser = "mestomusic";
+await sendEmails(browser, cookies, getEmailsToSend());
 
-await page.route(new RegExp(`soundcloud.com/${mainUser}`), async (route) => {
-  return route.continue({
-    url: route.request().url().replace(mainUser, stubUser),
-  });
-});
-
-const HOME_URL = `https://soundcloud.com/${mainUser}/following`;
-await page.goto(HOME_URL);
-
-await page.waitForTimeout(10000);
 await browser.close();
