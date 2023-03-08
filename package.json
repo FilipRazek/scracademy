@@ -7,6 +7,7 @@
     "basics": "cd basics && ts-node src/index.ts",
     "playwright": "cd playwright && ts-node src/index.ts",
     "challenge-1": "cd challenge-1 && ts-node src/index.ts",
+    "pagination-tutorial": "cd pagination-tutorial && ts-node index.ts",
     "test": "jest"
   },
   "author": "",
@@ -19,6 +20,7 @@
     "got-scraping": "^3.2.12",
     "json2csv": "^6.0.0-alpha.2",
     "playwright": "^1.31.1",
+    "puppeteer": "^19.7.3",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1"
   },
