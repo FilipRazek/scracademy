@@ -1,24 +1,25 @@
 import { chromium } from "playwright";
-
-const BASE_URL = "https://github.com";
-const REPOSITORIES_URL = `${BASE_URL}/orgs/facebook/repositories`;
-
+import {
+  getLastPageNumber,
+  getReposOnPage,
+  REPOSITORIES_URL,
+  scrapeReposFromPage,
+} from "./githubPaginationHelpers.js";
 const browser = await chromium.launch({ headless: false });
 const page = await browser.newPage();
 
 await page.goto(REPOSITORIES_URL);
-console.log(REPOSITORIES_URL);
+const lastPage = await getLastPageNumber(page);
 
-const lastPageElement = await page.waitForSelector(
-  'a[aria-label^="Page "]:nth-last-child(2)'
+const repos = await scrapeReposFromPage(page);
+await page.close();
+
+const pageNumbers = Array.from({ length: lastPage - 1 }, (_, i) => i + 2);
+const reposFromPages = await Promise.all(
+  pageNumbers.map(getReposOnPage(browser))
 );
+repos.push(...reposFromPages.flat());
 
-const lastPage = parseInt(
-  (await lastPageElement.getAttribute("aria-label")).replace(/\D/g, ""),
-  10
-);
-
-const pages = Array.from({ length: lastPage - 1 }, (_, i) => i + 2);
-console.log(pages);
+console.log(repos.length, repos[0]);
 
 await browser.close();
