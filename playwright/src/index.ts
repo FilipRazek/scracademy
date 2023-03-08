@@ -1,14 +1,24 @@
 import { chromium } from "playwright";
-import dotenv from "dotenv";
-import { getEmailsToSend, sendEmails, signInToYahoo } from "./yahooHelpers.js";
-dotenv.config();
 
-const USERNAME = process.env.YAHOO_USERNAME;
-const PASSWORD = process.env.YAHOO_PASSWORD;
+const BASE_URL = "https://github.com";
+const REPOSITORIES_URL = `${BASE_URL}/orgs/facebook/repositories`;
 
 const browser = await chromium.launch({ headless: false });
-const cookies = await signInToYahoo(browser, USERNAME, PASSWORD);
+const page = await browser.newPage();
 
-await sendEmails(browser, cookies, getEmailsToSend());
+await page.goto(REPOSITORIES_URL);
+console.log(REPOSITORIES_URL);
+
+const lastPageElement = await page.waitForSelector(
+  'a[aria-label^="Page "]:nth-last-child(2)'
+);
+
+const lastPage = parseInt(
+  (await lastPageElement.getAttribute("aria-label")).replace(/\D/g, ""),
+  10
+);
+
+const pages = Array.from({ length: lastPage - 1 }, (_, i) => i + 2);
+console.log(pages);
 
 await browser.close();

@@ -4,8 +4,9 @@
   "description": "Created with ts-node-init",
   "type": "module",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "challenge-1": "cd challenge-1 && ts-node index.ts",
+    "basics": "cd basics && ts-node src/index.ts",
+    "playwright": "cd playwright && ts-node src/index.ts",
+    "challenge-1": "cd challenge-1 && ts-node src/index.ts",
     "test": "jest"
   },
   "author": "",
