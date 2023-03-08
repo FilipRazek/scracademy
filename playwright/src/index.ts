@@ -1,25 +1,48 @@
+import { load } from "cheerio";
 import { chromium } from "playwright";
-import {
-  getLastPageNumber,
-  getReposOnPage,
-  REPOSITORIES_URL,
-  scrapeReposFromPage,
-} from "./githubPaginationHelpers.js";
+
 const browser = await chromium.launch({ headless: false });
 const page = await browser.newPage();
 
-await page.goto(REPOSITORIES_URL);
-const lastPage = await getLastPageNumber(page);
+const BASE_URL = "https://www.aboutyou.com/c/women/clothing-20204";
+await page.goto(BASE_URL);
 
-const repos = await scrapeReposFromPage(page);
-await page.close();
+const productTileSelector = 'a[data-testid*="productTile"]';
 
-const pageNumbers = Array.from({ length: lastPage - 1 }, (_, i) => i + 2);
-const reposFromPages = await Promise.all(
-  pageNumbers.map(getReposOnPage(browser))
+const itemHeight = await page.$eval(
+  productTileSelector,
+  (tile) => tile.clientHeight
 );
-repos.push(...reposFromPages.flat());
+let totalScrolledDistance = 0;
 
-console.log(repos.length, repos[0]);
+const products = [];
+const DESIRED_NUMBER_OF_PRODUCTS = 75;
+while (products.length < DESIRED_NUMBER_OF_PRODUCTS) {
+  const additionalScrollHeight = itemHeight * 3;
+  await page.mouse.wheel(0, additionalScrollHeight);
+  totalScrolledDistance += additionalScrollHeight;
+  await page.waitForTimeout(1000);
 
+  const $ = load(await page.content());
+  const newTiles = [...$(productTileSelector)].slice(products.length);
+  const newItems = newTiles.map((tile) => {
+    const element = $(tile);
+    return {
+      brand: element.find('p[data-testid="brandName"]').text().trim(),
+      price: element.find('span[data-testid="finalPrice"]').text().trim(),
+    };
+  });
+
+  products.push(...newItems);
+
+  const availableScroll = await page.evaluate(
+    () => document.body.scrollHeight - window.innerHeight
+  );
+  // If we have scrolled to the bottom, break
+  if (totalScrolledDistance >= availableScroll) {
+    break;
+  }
+}
+
+console.log(products.slice(0, DESIRED_NUMBER_OF_PRODUCTS));
 await browser.close();
