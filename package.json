@@ -10,6 +10,7 @@
     "pagination-tutorial": "cd pagination-tutorial && ts-node index.ts",
     "proxy-rotation": "cd proxy-rotation && ts-node index.ts",
     "mini-project": "cd mini-project && ts-node index.ts",
+    "py-apify-client": "cd py-apify-client && python main.py",
     "test": "jest"
   },
   "author": "",
