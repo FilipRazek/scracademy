@@ -1,0 +1,18 @@
+{
+  "name": "calculactor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apify": "^3.1.2",
+    "typescript": "^4.9.5"
+  }
+}

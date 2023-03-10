@@ -1,0 +1,21 @@
+{
+  "title": "Calculating operations",
+  "description": "Calculate a chosen operation on a list of numbers",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "numbers": {
+      "title": "Number list",
+      "description": "The list of numbers to use",
+      "type": "array",
+      "editor": "json"
+    },
+    "operator": {
+      "title": "Operator",
+      "description": "The operator to use",
+      "type": "string",
+      "enum": ["+", "-", "^"]
+    }
+  },
+  "required": ["numbers", "operator"]
+}
