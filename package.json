@@ -9,6 +9,7 @@
     "challenge-1": "cd challenge-1 && ts-node src/index.ts",
     "pagination-tutorial": "cd pagination-tutorial && ts-node index.ts",
     "proxy-rotation": "cd proxy-rotation && ts-node index.ts",
+    "mini-project": "cd mini-project && ts-node index.ts",
     "test": "jest"
   },
   "author": "",
